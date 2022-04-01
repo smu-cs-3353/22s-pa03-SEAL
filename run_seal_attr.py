@@ -123,7 +123,7 @@ class Runner:
         # Save Dir and Pretrained Dir
         self.savedir, self.pretrain_dir, self.writer = self.init_dir()
         # Model
-        self.device = torch.device('cuda:0')
+        self.device = torch.device('cuda:0') if args.cuda == True else torch.device('cpu')
         self.g = self.init_g(nodefeats)
         self.d = self.init_d(self.g.nodefeats)
         self.l = self.init_l(self.g.nodefeats)
@@ -414,6 +414,7 @@ if __name__ == '__main__':
     parser.add_argument('--eval_every', type=int, default=1)
     parser.add_argument('--test_every', type=int, default=10)
     parser.add_argument('--without_tf', action='store_true', default=False)
+    parser.add_argument('--cuda', action='store_true', default=False)
 
     args = parser.parse_args()
     seed_all(args.seed)
