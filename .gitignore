@@ -1,4 +1,4 @@
 datasets/
 __pycache__/
 ckpts/
-seal_attr/
+seal_attr/__pycache__/
