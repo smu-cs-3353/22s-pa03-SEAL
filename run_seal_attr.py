@@ -382,8 +382,8 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--dataset', type=str, default='football/football')
-    parser.add_argument('--root', type=str, default='ourDatasets')
+    parser.add_argument('--dataset', type=str, default='dblp')
+    parser.add_argument('--root', type=str, default='datasets')
     parser.add_argument('--seed', type=int, default=0)
     parser.add_argument('--train_size', type=int, default=500)
     parser.add_argument('--n_outputs', type=int, default=5000)
