@@ -32,6 +32,7 @@ def load_dataset(root, name):
 
 
 def split_comms(graph, comms, train_size):
+    assert len(comms) >= train_size, "train_size too large"
     train_comms, test_comms = comms[:train_size], comms[train_size:]
     n_valid = max(1, int(train_size * 0.1))
     train_comms, valid_comms = train_comms[:-n_valid], train_comms[-n_valid:]
@@ -381,8 +382,8 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--dataset', type=str, default='dblp')
-    parser.add_argument('--root', type=str, default='datasets')
+    parser.add_argument('--dataset', type=str, default='football/football')
+    parser.add_argument('--root', type=str, default='ourDatasets')
     parser.add_argument('--seed', type=int, default=0)
     parser.add_argument('--train_size', type=int, default=500)
     parser.add_argument('--n_outputs', type=int, default=5000)
