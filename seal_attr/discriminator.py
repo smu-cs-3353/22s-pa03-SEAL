@@ -31,9 +31,9 @@ class Discriminator:
 
     def score_comms(self, nodes: List[List[int]]):
         if self.with_attr:
-            batch_g = dgl.BatchedDGLGraph([self.prepare_graph(x) for x in nodes], ['state', 'feats'], None)
+            batch_g = dgl.batch([self.prepare_graph(x) for x in nodes], ['state', 'feats'], None)
         else:
-            batch_g = dgl.BatchedDGLGraph([self.prepare_graph(x) for x in nodes], 'state', None)
+            batch_g = dgl.batch([self.prepare_graph(x) for x in nodes], ['state'], None)
         self.model.eval()
         with torch.no_grad():
             logits = self.model(batch_g)
@@ -57,7 +57,7 @@ class Discriminator:
         else:
             state = torch.ones(len(nodes), dtype=torch.long, device=self.device)
         subg = self.dgl_graph.subgraph(nodes)
-        subg.copy_from_parent()
+        #subg.copy_from_parent()
         # subg = dgl.DGLGraph(self.graph.adj_mat[nodes][:, nodes])
         subg.ndata['state'] = state
         return subg
@@ -71,9 +71,9 @@ class Discriminator:
             subg = self.prepare_graph(nodes)
             subgs.append(subg)
         if self.with_attr:
-            batch_graph = dgl.BatchedDGLGraph(subgs, ['state', 'feats'], None)
+            batch_graph = dgl.batch(subgs, ['state', 'feats'], None)
         else:
-            batch_graph = dgl.BatchedDGLGraph(subgs, 'state', None)
+            batch_graph = dgl.batch(subgs, ['state'], None)
         labels = torch.cat([torch.ones(len(pos_comms)), torch.zeros(len(neg_comms))]).long().to(self.device)
         self.model.train()
         self.optimizer.zero_grad()

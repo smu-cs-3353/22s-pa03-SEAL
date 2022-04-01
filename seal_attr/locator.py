@@ -40,7 +40,7 @@ class Locator:
         else:
             state = torch.ones(len(nodes), dtype=torch.long, device=self.device)
         subg = self.dgl_graph.subgraph(nodes)
-        subg.copy_from_parent()
+        #subg.copy_from_parent()
         subg.ndata['state'] = state
         return subg
 
@@ -48,14 +48,14 @@ class Locator:
         comms = [list(x) for x in nodes]
         subgs = [self.prepare_graph(x) for x in comms]
         if self.with_attr:
-            batched_graph = dgl.BatchedDGLGraph(subgs, ['state', 'feats'], None)
+            batched_graph = dgl.batch(subgs, ['state', 'feats'], None)
         else:
-            batched_graph = dgl.BatchedDGLGraph(subgs, 'state', None)
+            batched_graph = dgl.batch(subgs, ['state'], None)
         self.model.eval()
         all_logits, values = self.model(batched_graph)
         offset = 0
         rewards = []
-        for comm, n_nodes in zip(comms, batched_graph.batch_num_nodes):
+        for comm, n_nodes in zip(comms, batched_graph.batch_num_nodes()):
             scores = all_logits[offset:offset+len(comm)]
             offset += n_nodes
             rewards.append((scores <= scores[0]).float().mean().item())
@@ -66,16 +66,16 @@ class Locator:
         comms = [list(x) for x in comms]
         subgs = [self.prepare_graph(x) for x in comms]
         if self.with_attr:
-            batched_graph = dgl.BatchedDGLGraph(subgs, ['state', 'feats'], None)
+            batched_graph = dgl.batch(subgs, ['state', 'feats'], None)
         else:
-            batched_graph = dgl.BatchedDGLGraph(subgs, 'state', None)
+            batched_graph = dgl.batch(subgs, ['state'], None)
         self.model.train()
         self.optimizer.zero_grad()
         all_logits, values = self.model(batched_graph)
         offset = 0
         seeds = []
         logps = []
-        for comm, n_nodes in zip(comms, batched_graph.batch_num_nodes):
+        for comm, n_nodes in zip(comms, batched_graph.batch_num_nodes()):
             logits = torch.log_softmax(all_logits[offset:offset+len(comm)], 0)
             offset += n_nodes
             ps = torch.exp(logits.detach())
